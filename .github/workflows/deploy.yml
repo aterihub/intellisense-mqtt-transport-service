@@ -63,4 +63,4 @@ jobs:
           sudo docker rmi sigitnurmajid/intellisense-mqtt-transport-service:main
           sudo docker pull sigitnurmajid/intellisense-mqtt-transport-service:main
 
-          docker run -d --name intellisense-mqtt-transport-service --network deploy_default -v ${pwd}/config/config.intellisense-mqtt-transport-service.json:/etc/intellisense-mqtt-transport-service/config.json --restart always sigitnurmajid/intellisense-mqtt-transport-service:main
+          sudo docker run -d --name intellisense-mqtt-transport-service --network deploy_default -v ${pwd}/config/config.intellisense-mqtt-transport-service.json:/etc/intellisense-mqtt-transport-service/config.json --restart always sigitnurmajid/intellisense-mqtt-transport-service:main
