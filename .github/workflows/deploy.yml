@@ -19,6 +19,7 @@ jobs:
       
       - name: Create config json production
         run: |
+          mkdir config
           echo "${{ secrets.CONFIG_JSON_PRODUCTION }}" > ${pwd}/config/config.intellisense-mqtt-transport-service.json
 
       - name: Log in to Docker Hub
