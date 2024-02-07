@@ -25,8 +25,6 @@ func CreateEvent(nats *service.Nats, mqtt *service.Mqtt, totalWorker int) *Runne
 
 func (r *RunnerEvent) ListenMessage(ctx context.Context) {
 	r.mqttC.Mqtt.Subscribe("AI/#", 1, func(client mqtt.Client, msg mqtt.Message) {
-		fmt.Printf("Worker received message on topic %s: %s\n", msg.Topic(), msg.Payload())
-
 		// Forward the message to NATS
 		topic := strings.Replace(msg.Topic(), "/", ".", -1)
 		err := r.natsC.Nc.Publish(topic, msg.Payload())
