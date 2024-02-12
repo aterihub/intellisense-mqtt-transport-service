@@ -2,6 +2,7 @@ package runner
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"insellisense-mqtt-transport-service/service"
 	"strings"
@@ -27,9 +28,48 @@ func (r *RunnerEvent) ListenMessage(ctx context.Context) {
 	r.mqttC.Mqtt.Subscribe("AI/#", 1, func(client mqtt.Client, msg mqtt.Message) {
 		// Forward the message to NATS
 		topic := strings.Replace(msg.Topic(), "/", ".", -1)
-		err := r.natsC.Nc.Publish(topic, msg.Payload())
-		if err != nil {
-			fmt.Println("Error forwarding message to NATS:", err)
+		arrTopic := strings.Split(topic, ".")
+
+		switch arrTopic[len(arrTopic)-1] {
+		case "heartbeat":
+			r.PublishMessage(topic, msg.Payload())
+			return
+		case "data":
+			var message MessageData
+			err := json.Unmarshal(msg.Payload(), &message)
+			if err != nil {
+				fmt.Println("Error parsing JSON:", err)
+				return
+			}
+
+			messageSent := MessageSent{
+				MessageId: message.MessageId,
+				LoraRssi:  message.LoraRssi,
+				Ts:        message.Ts,
+				Data:      make(map[string]int),
+			}
+
+			for _, modbusData := range message.Data.ModbusData {
+				code := message.Data.SlaveId*10 + modbusData.Address
+				stringCode := checkFieldType(code)
+
+				messageSent.Data[stringCode] = modbusData.Value
+			}
+
+			jsonData, err := json.MarshalIndent(messageSent, "", "  ")
+			if err != nil {
+				fmt.Println("Error marshalling JSON:", err)
+				return
+			}
+			r.PublishMessage(topic, jsonData)
+			return
 		}
 	})
+}
+
+func (r *RunnerEvent) PublishMessage(context string, message []byte) {
+	err := r.natsC.Nc.Publish(context, message)
+	if err != nil {
+		fmt.Println("Error forwarding message to NATS:", err)
+	}
 }
