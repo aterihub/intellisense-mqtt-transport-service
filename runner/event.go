@@ -50,8 +50,7 @@ func (r *RunnerEvent) ListenMessage(ctx context.Context) {
 			}
 
 			for _, modbusData := range message.Data.ModbusData {
-				code := message.Data.SlaveId*10 + modbusData.Address
-				stringCode := checkFieldType(code)
+				stringCode := checkFieldType(message.Data.SlaveId, modbusData.Address)
 
 				messageSent.Data[stringCode] = modbusData.Value
 			}

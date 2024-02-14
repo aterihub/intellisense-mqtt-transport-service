@@ -1,5 +1,7 @@
 package runner
 
+import "strconv"
+
 type ModbusData struct {
 	Address  int `json:"address"`
 	Function int `json:"function"`
@@ -26,9 +28,17 @@ type MessageSent struct {
 	Data      map[string]int `json:"data"`
 }
 
-func checkFieldType(code int) string {
-	field := map[int]string{
-		22: "TDS",
+func checkFieldType(slaveId int, address int) string {
+	code := strconv.Itoa(slaveId) + strconv.Itoa(address)
+	field := map[string]string{
+		"20":  "conductivity",
+		"22":  "temperature",
+		"28":  "tds",
+		"210": "salinity",
+		"212": "conductivity_calibration",
+		"235": "conductivity_signal_1",
+		"236": "conductivity_signal_2",
+		"237": "temperature_signal_AD",
 	}
 
 	if field[code] == "" {
