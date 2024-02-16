@@ -29,20 +29,23 @@ type MessageSent struct {
 }
 
 func checkFieldType(slaveId int, address int) string {
-	code := strconv.Itoa(slaveId) + strconv.Itoa(address)
-	field := map[string]string{
-		"20":  "conductivity",
-		"22":  "temperature",
-		"28":  "tds",
-		"210": "salinity",
-		"212": "conductivity_calibration",
-		"235": "conductivity_signal_1",
-		"236": "conductivity_signal_2",
-		"237": "temperature_signal_AD",
-	}
+	slave := strconv.Itoa(slaveId)
+	addrs := strconv.Itoa(address)
 
-	if field[code] == "" {
+	if slave == "2" {
+		code := slave + addrs
+		field := map[string]string{
+			"20":  "conductivity",
+			"22":  "temperature",
+			"28":  "tds",
+			"210": "salinity",
+			"212": "conductivity_calibration",
+			"235": "conductivity_signal_1",
+			"236": "conductivity_signal_2",
+			"237": "temperature_signal_AD",
+		}
+		return field[code]
+	} else {
 		return "flow"
 	}
-	return field[code]
 }
