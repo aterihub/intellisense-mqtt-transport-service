@@ -46,6 +46,6 @@ func checkFieldType(slaveId int, address int) string {
 		}
 		return field[code]
 	} else {
-		return "flow"
+		return "volume"
 	}
 }
