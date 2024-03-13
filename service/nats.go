@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"insellisense-mqtt-transport-service/config"
+	"log"
 
 	"github.com/nats-io/nats.go"
 )
@@ -24,7 +25,15 @@ func NewNatsService(ctx context.Context, conf config.Nats) (*Nats, error) {
 }
 
 func (n *Nats) connectToNatsServer(ctx context.Context, url string, user string, pass string) error {
-	nc, err := nats.Connect(url, nats.UserInfo(user, pass))
+	nc, err := nats.Connect(url, nats.UserInfo(user, pass), nats.DisconnectErrHandler(func(_ *nats.Conn, err error) {
+		log.Printf("NATS Service disconnected: %v", err)
+	}),
+		nats.ReconnectHandler(func(_ *nats.Conn) {
+			log.Printf("NATS Service reconnected")
+		}),
+		nats.ClosedHandler(func(_ *nats.Conn) {
+			log.Printf("NATS Service closed")
+		}))
 	if err != nil {
 		return fmt.Errorf("error when connect to NATS Server, url: %s, user: %s. error: %w", url, user, err)
 	}
