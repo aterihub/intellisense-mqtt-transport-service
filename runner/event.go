@@ -50,9 +50,11 @@ func (r *RunnerEvent) ListenMessage(ctx context.Context) {
 			}
 
 			for _, modbusData := range message.Data.ModbusData {
-				stringCode := checkFieldType(message.Data.SlaveId, modbusData.Address)
+				stringCode, err := checkFieldType(message.Data.SlaveId, modbusData.Address)
 
-				messageSent.Data[stringCode] = modbusData.Value
+				if err == nil {
+					messageSent.Data[stringCode] = modbusData.Value
+				}
 			}
 
 			jsonData, err := json.MarshalIndent(messageSent, "", "  ")
